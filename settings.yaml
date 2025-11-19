@@ -1,0 +1,40 @@
+# Base settings
+base_path: .
+
+# Data paths
+raw_train_path: relabel/train/images
+augmented_train_path: relabel_aug/train/images
+val_path: relabel/val/images
+
+# Class names
+names:
+  0: light_blue
+  1: dark_blue
+  2: others
+
+# Training settings
+training:
+  model: yolov9t.pt
+  epochs: 100
+  imgsz: 640
+  batch: -1  # -1 for auto batch size
+  device: ''  # '' for auto, '0' for GPU 0, 'cpu' for CPU
+  project: runs/train
+  name: exp
+
+# Inference settings
+inference:
+  model: runs/detect/train/weights/best.pt
+  conf: 0.25
+  iou: 0.45
+
+augmentation:
+  aug_per_image: 30
+  horizontal_flip: 0.4
+  vertical_flip: 0.2
+  rotation_limit: 20
+  brightness_contrast: 0.4
+  blur: 0.2
+  scale: 0.2
+  shift_limit: 0.05
+  scale_limit: 0.05
