@@ -37,10 +37,6 @@ runs/
 # CI/CD
 .github/
 
-# Documentation
-*.md
-docs/
-
 # Misc
 .env
 .DS_Store
