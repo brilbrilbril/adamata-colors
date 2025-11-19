@@ -51,6 +51,7 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 COPY bsort/ ./bsort/
 COPY pyproject.toml ./
 COPY settings.yaml ./
+COPY README.md ./
 
 # Install the package
 RUN pip install --no-cache-dir -e .
