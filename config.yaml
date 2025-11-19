@@ -1,9 +1,0 @@
-path: .
-
-train: relabel_aug/train/images
-val: relabel/val/images
-
-names:
-  0: light_blue
-  1: dark_blue
-  2: others
