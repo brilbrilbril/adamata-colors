@@ -1,66 +1,34 @@
-# Multi-stage build for smaller image size
-FROM python:3.10-slim as builder
+# ----------- builder -----------
+FROM python:3.10-slim AS builder
+WORKDIR /build
 
-# Set working directory
-WORKDIR /app
-
-# Install system dependencies
+# system deps needed to compile
 RUN apt-get update && apt-get install -y \
-    gcc \
-    g++ \
-    libglib2.0-0 \
-    libsm6 \
-    libxext6 \
-    libxrender-dev \
-    libgomp1 \
-    libgl1 \
-    && rm -rf /var/lib/apt/lists/*
+    gcc g++ libglib2.0-0 libsm6 libxext6 libxrender-dev libgomp1 libgl1 \
+ && rm -rf /var/lib/apt/lists/*
 
-# Install Poetry
+# install poetry and build the wheel
 RUN pip install --no-cache-dir poetry==2.2.1
+COPY pyproject.toml poetry.lock ./
+RUN poetry build -f wheel
 
-# Copy only dependency files first (for caching)
-COPY pyproject.toml ./
-
-# Configure poetry to not create virtual env (we're in a container)
-RUN poetry config virtualenvs.create false
-
-# Install dependencies
-RUN poetry install --no-interaction --no-ansi --no-root
-
-# Final stage
+# ----------- runtime -----------
 FROM python:3.10-slim
-
 WORKDIR /app
 
-# Install runtime dependencies
+# runtime libs only
 RUN apt-get update && apt-get install -y \
-    libglib2.0-0 \
-    libsm6 \
-    libxext6 \
-    libxrender-dev \
-    libgomp1 \
-    libgl1 \
-    && rm -rf /var/lib/apt/lists/*
+    libglib2.0-0 libsm6 libxext6 libxrender-dev libgomp1 libgl1 \
+ && rm -rf /var/lib/apt/lists/*
 
-# Copy installed packages from builder
-COPY --from=builder /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
-COPY --from=builder /usr/local/bin /usr/local/bin
+# copy wheel and install (pulls only runtime deps)
+COPY --from=builder /build/dist/*.whl .
+RUN pip install --no-cache-dir *.whl && rm *.whl
 
-# Copy application code
+# copy application files
 COPY bsort/ ./bsort/
-COPY pyproject.toml ./
 COPY settings.yaml ./
 
-# Install the package
-RUN pip install --no-cache-dir -e .
-
-# Create directories for data
 RUN mkdir -p /app/data /app/runs
-
-# Set environment variables
-ENV PYTHONUNBUFFERED=1
-ENV WANDB_DIR=/app/runs
-
-# Default command
+ENV PYTHONUNBUFFERED=1 WANDB_DIR=/app/runs
 CMD ["bsort", "--help"]
