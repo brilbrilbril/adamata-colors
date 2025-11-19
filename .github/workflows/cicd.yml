@@ -86,6 +86,10 @@ jobs:
     needs: tests
     
     steps:
+
+    - name: Free up disk space
+      run: |
+        sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/share/boost /opt/hostedtoolcache
     - name: Checkout code
       uses: actions/checkout@v4
     
