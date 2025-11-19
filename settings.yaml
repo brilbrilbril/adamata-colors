@@ -19,8 +19,7 @@ training:
   imgsz: 640
   batch: -1  # -1 for auto batch size
   device: ''  # '' for auto, '0' for GPU 0, 'cpu' for CPU
-  project: runs/train
-  name: exp
+  project: runs/detect/
 
 # Inference settings
 inference:
@@ -38,3 +37,9 @@ augmentation:
   scale: 0.2
   shift_limit: 0.05
   scale_limit: 0.05
+
+wandb:
+  enabled: true
+  project: bsort-yolo  # Your WandB project name
+  entity: null  # Your WandB username/team (optional, leave null for default)
+  name: null  # Run name (optional, leave null for auto-generated)
