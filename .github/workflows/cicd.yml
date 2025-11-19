@@ -114,6 +114,9 @@ jobs:
           type=semver,pattern={{version}}
           type=semver,pattern={{major}}.{{minor}}
           type=sha
+          
+    - name: Docker system usage
+      run: docker system df
     
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
