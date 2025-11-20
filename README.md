@@ -24,6 +24,45 @@ By: Brillyando Magathan Achmad
 
 
 
+- Installation:
+    1. Clone this repository
+
+    ```
+    git clone https://github.com/brilbrilbril/adamata-colors.git
+    ```
+
+    2. Head to root project directory
+
+    ```
+    cd adamata-colors
+    ```
+
+    3. Install poetry. Please refer to its official documentation: https://python-poetry.org/docs/
+
+    4. Make sure your python version is 3.10+, otherwise this project wont work.
+
+    5. Install the dependencies
+
+    ```
+    poetry install
+    ```
+
+    6. Activate the virtual environment
+
+    ```
+    poetry env activate
+    ``` 
+
+    OR 
+
+    ```
+    poetry self add poetry-plugin-shell
+
+    poetry shell
+    ```
+
+    7. Now you can augment the images, train model, or do inference.
+
 - CLI Command Documentations:
 
 **Base Command:** `bsort`
