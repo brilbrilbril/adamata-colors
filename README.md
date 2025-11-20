@@ -21,8 +21,24 @@ By: Brillyando Magathan Achmad
     To enrich the dataset, I do the augmentation using albumentations, thus the model training can leverage the augmented dataset. Of course if you want to train by yourself, you can decide to do augmentation or not (read more in the CLI commands below)
 
 - Result:
+      Using CPU only on my machine:
+          Training and validation:
+  <img width="1647" height="859" alt="Screenshot 2025-11-20 214734" src="https://github.com/user-attachments/assets/22aa67a1-b562-478e-a3be-79a174db7b48" />
+  <img width="1686" height="525" alt="Screenshot 2025-11-20 214752" src="https://github.com/user-attachments/assets/14652035-4b21-4d76-98a9-4e0c4023b1fa" />
+          Inference:
+  <img width="1769" height="791" alt="Screenshot 2025-11-20 214918" src="https://github.com/user-attachments/assets/903f0187-72ef-4b2b-8a52-6b7b1d524e87" />
 
+  You can see that the training time for 100 epochs was 1 hour with validation mAP50 reached 0.995. This indicates overfit due to lack of dataset.
+  The inference reached speed time 43-48ms which is far from the objective.
 
+      Using GPU:
+          Training and validation:
+  <img width="1736" height="668" alt="image" src="https://github.com/user-attachments/assets/28340450-5693-433b-840c-24593745b4dd" />
+  <img width="1640" height="523" alt="Screenshot 2025-11-20 222226" src="https://github.com/user-attachments/assets/4963115c-b041-4ed4-90cf-b0ede1d090bd" />
+          Inference:
+  <img width="1767" height="919" alt="Screenshot 2025-11-20 222305" src="https://github.com/user-attachments/assets/00759119-39ca-44af-8722-08e0c7da1fff" />
+
+  You can see that the training and validation mAP50 did not differ that much. But the inference time decreased until it reached 10-15ms per image inference. This was the most challenging one because the objective still did not achieve yet even after using GPU Cuda supported.
 
 - Installation:
     1. Clone this repository
