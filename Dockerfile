@@ -8,6 +8,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
+    curl \
     libglib2.0-0 \
     libsm6 \
     libxext6 \
@@ -17,23 +18,33 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Poetry
-RUN pip install --no-cache-dir poetry==2.2.1
+ENV POETRY_VERSION=1.7.1
+ENV POETRY_HOME=/opt/poetry
+ENV POETRY_NO_INTERACTION=1
+ENV POETRY_VIRTUALENVS_IN_PROJECT=true
+ENV POETRY_VIRTUALENVS_CREATE=true
 
-# Copy only dependency files first (for caching)
+RUN curl -sSL https://install.python-poetry.org | python3 - && \
+    ln -s /opt/poetry/bin/poetry /usr/local/bin/poetry
+
+# Copy dependency files
 COPY pyproject.toml ./
 
-# Configure poetry to not create virtual env (we're in a container)
-RUN poetry config virtualenvs.create false
+# Install dependencies (without the root package yet)
+RUN poetry install --no-root --only main
 
-# Install dependencies
-RUN poetry install --no-interaction --no-ansi --no-root
+# Copy application code
+COPY bsort/ ./bsort/
+
+# Install the root package
+RUN poetry install --only-root
 
 # Final stage
 FROM python:3.10-slim
 
 WORKDIR /app
 
-# Install runtime dependencies
+# Install runtime dependencies only
 RUN apt-get update && apt-get install -y \
     libglib2.0-0 \
     libsm6 \
@@ -43,18 +54,16 @@ RUN apt-get update && apt-get install -y \
     libgl1 \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy installed packages from builder
-COPY --from=builder /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
-COPY --from=builder /usr/local/bin /usr/local/bin
+# Copy the virtual environment from builder
+COPY --from=builder /app/.venv /app/.venv
 
 # Copy application code
-COPY bsort/ ./bsort/
-COPY pyproject.toml ./
-COPY settings.yaml ./
-COPY README.md ./
+COPY --from=builder /app/bsort /app/bsort
+COPY --from=builder /app/pyproject.toml /app/pyproject.toml
+COPY settings.yaml /app/settings.yaml
 
-# Install the package
-RUN pip install --no-cache-dir -e .
+# Add virtual environment to PATH
+ENV PATH="/app/.venv/bin:$PATH"
 
 # Create directories for data
 RUN mkdir -p /app/data /app/runs
