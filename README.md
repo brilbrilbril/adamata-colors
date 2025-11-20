@@ -3,22 +3,22 @@ Adamata Take Home Test: Bottle Caps Color Detection
 By: Brillyando Magathan Achmad
 
 - Project Summary:
-Given images that consist of several bottle caps, the project's objectives are to detect and classify the colors into 3 classes: light blue (0), dark blue (1), and others (2).
+    Given images that consist of several bottle caps, the project's objectives are to detect and classify the colors into 3 classes: light blue (0), dark blue (1), and others (2).
 
-This project uses YOLOv9 Tiny version, since it's the most lightweight model, but still has decent performance among the newer one. https://docs.ultralytics.com/models/yolov9/ 
+    This project uses YOLOv9 Tiny version, since it's the most lightweight model, but still has decent performance among the newer one. https://docs.ultralytics.com/models/yolov9/ 
 
-Why do I choose YOLOv9 Tiny, instead of YOLO11n? Because the objective of this test is to integrate the system into edge device, such as raspberry pi 5. YOLO11n is exactly better in the performance, but it has 3M parameters, so it's very doubtful when it comes to inference - since this tests aim to run on 5-10ms speed.
+    Why do I choose YOLOv9 Tiny, instead of YOLO11n? Because the objective of this test is to integrate the system into edge device, such as raspberry pi 5. YOLO11n is exactly better in the performance, but it has 3M parameters, so it's very doubtful when it comes to inference - since this tests aim to run on 5-10ms speed.
 
 - Dataset Overview:
-The dataset consists of 12 images along with its label. But, the labels itself do not represent the actual color (ground truth) yet. So I have to assign the label by myself. Here I experimented with 2 methods, which is rule-based automatic label and manual assignment.
+    The dataset consists of 12 images along with its label. But, the labels itself do not represent the actual color (ground truth) yet. So I have to assign the label by myself. Here I experimented with 2 methods, which is rule-based automatic label and manual assignment.
 
-1. Rule-based
-The rule-based method is assign the color by the HSV threshold. For example, the blue color is likely in 88 <= H <= 110. Then the difference between light blue and dark blue is in the V, which is approx 95. Using this method will save my time to annotate the ground truth of the colors. But, it's so difficult to tweak the threshold since ground truths must be 100% correct.
+    1. Rule-based
+        The rule-based method is assign the color by the HSV threshold. For example, the blue color is likely in 88 <= H <= 110. Then the difference between light blue and dark blue is in the V, which is approx 95. Using this method will save my time to annotate the ground truth of the colors. But, it's so difficult to tweak the threshold since ground truths must be 100% correct.
 
-2. Manual assignment
-Since there's no explanation in the description that the bottle caps appear in an image have different color, so I decided to assign it the same because it looks so identical (at least for me). In other words, for an image, the bottle caps have the same color.
+    2. Manual assignment
+        Since there's no explanation in the description that the bottle caps appear in an image have different color, so I decided to assign it the same because it looks so identical (at least for me). In other words, for an image, the bottle caps have the same color.
 
-To enrich the dataset, I do the augmentation using albumentations, thus the model training can leverage the augmented dataset. Of course if you want to train by yourself, you can decide to do augmentation or not (read more in the CLI commands below)
+    To enrich the dataset, I do the augmentation using albumentations, thus the model training can leverage the augmented dataset. Of course if you want to train by yourself, you can decide to do augmentation or not (read more in the CLI commands below)
 
 - Result:
 
