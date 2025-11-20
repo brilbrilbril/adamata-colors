@@ -1,9 +1,10 @@
 import os
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
 
 import click
-import wandb
 from ultralytics import YOLO
+
+import wandb
 
 from .helper import create_dynamic_yolo_config, load_config
 
