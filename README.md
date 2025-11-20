@@ -119,3 +119,6 @@ bsort infer -c path/to/settings.yaml -i path/to/image.jpg --save
 # Run inference on a directory of images, display results, and use a custom confidence threshold
 bsort infer -c path/to/settings.yaml -d path/to/images_folder --show --conf 0.4
 ```
+
+
+**You can check the wandb.ai training monitor here:** https://wandb.ai/maghatan-a/bsort-yolo
