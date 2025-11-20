@@ -63,6 +63,26 @@ By: Brillyando Magathan Achmad
 
     7. Now you can augment the images, train model, or do inference.
 
+    **NOTE:** If you want have CUDA GPU and want to utilize it for training, please uninstall and install the correct pytorch dependency for GPU utilization
+
+    ```
+    poetry run pip uninstall -y torch torchvision 
+    ```
+
+    ```
+    poetry run pip install torch torchvision --index-url https://download.pytorch.org/whl/cu126
+    ```
+
+    Then you can insert the ```--device 0``` in the command. 
+
+
+- Running recommendation:
+1. Run augmentation first
+2. Set the wandb API KEY if you want to monitor
+3. Run the training command.
+4. Do inference with --show or --save enabled
+
+
 - CLI Command Documentations:
 
 **Base Command:** `bsort`
