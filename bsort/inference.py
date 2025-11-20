@@ -1,6 +1,5 @@
 import glob
 import os
-from typing import Optional, List, Dict, Any
 
 import click
 import cv2
@@ -10,75 +9,19 @@ from ultralytics import YOLO
 from .helper import load_config
 
 
-def run_inference(
-    config_path: str,
-    image: Optional[str] = None,
-    dir: Optional[str] = None,
-    model: Optional[str] = None,
-    conf: Optional[float] = None,
-    save: bool = False,
-    show: bool = False
-) -> None:
-    """Run YOLO inference on single or multiple images.
-
-    Performs object detection using a trained YOLO model on specified images.
-    Results can be displayed interactively and/or saved to disk with bounding
-    boxes and labels visualized.
-
-    Args:
-        config_path: Path to the YAML configuration file containing inference settings.
-        image: Path to a single image file for inference. Mutually exclusive with dir.
-            Defaults to None.
-        dir: Path to a directory containing multiple images for batch inference.
-            Mutually exclusive with image. Defaults to None.
-        model: Path to the YOLO model weights file (.pt). If None, uses the path
-            specified in config. Defaults to None.
-        conf: Confidence threshold for detections (0.0 to 1.0). If None, uses
-            the threshold specified in config. Defaults to None.
-        save: If True, saves annotated images with detections to
-            'runs/detect/predict/'. Defaults to False.
-        show: If True, displays each annotated image interactively using matplotlib.
-            Defaults to False.
-
-    Returns:
-        None
-
-    Raises:
-        click.Abort: If required files/directories are not found, no images are
-            specified, or inference fails.
-        FileNotFoundError: If the config file cannot be found.
-        Exception: If an unexpected error occurs during inference.
-
-    Examples:
-        >>> # Run inference on a single image
-        >>> run_inference('config.yaml', image='test.jpg', save=True)
-        
-        >>> # Run inference on a directory with custom confidence
-        >>> run_inference('config.yaml', dir='images/', conf=0.5, show=True)
-        
-        >>> # Use default settings from config
-        >>> run_inference('config.yaml')
-
-    Note:
-        - If neither image nor dir is specified, the function attempts to use
-          the default image directory from the config file.
-        - Only .jpg images are processed when using directory mode.
-        - The --save flag creates output in 'runs/detect/predict/' directory.
-        - The --show flag requires a display environment (won't work headless).
-    """
+def run_inference(config_path, image=None, dir=None, model=None, conf=None, save=False, show=False):
+    """Run inference on image(s)."""
     click.echo(click.style("\n=== Inference ===", fg="cyan", bold=True))
 
     try:
-        settings: Dict[str, Any] = load_config(config_path)
+        settings = load_config(config_path)
         click.echo(f"Loaded config: {config_path}")
 
-        infer_settings: Dict[str, Any] = settings.get("inference", {})
-        model_path: str = model or infer_settings.get(
-            "model", "runs/detect/train/weights/best.pt"
-        )
-        confidence: float = conf or infer_settings.get("conf", 0.25)
+        infer_settings = settings.get("inference", {})
+        model_path = model or infer_settings.get("model", "runs/detect/train/weights/best.pt")
+        confidence = conf or infer_settings.get("conf", 0.25)
 
-        image_paths: List[str] = []
+        image_paths = []
         if image:
             if not os.path.exists(image):
                 click.echo(click.style(f"Image not found: {image}", fg="red"))
@@ -93,14 +36,12 @@ def run_inference(
                 click.echo(click.style(f"No .jpg images found in {dir}", fg="red"))
                 raise click.Abort()
         else:
-            default_dir: str = infer_settings.get("image_dir", "unseen")
+            default_dir = infer_settings.get("image_dir", "unseen")
             if os.path.exists(default_dir):
                 image_paths = glob.glob(os.path.join(default_dir, "*.jpg"))
 
             if not image_paths:
-                click.echo(
-                    click.style("No images specified. Use --image or --dir", fg="red")
-                )
+                click.echo(click.style("No images specified. Use --image or --dir", fg="red"))
                 raise click.Abort()
 
         if not os.path.exists(model_path):
@@ -111,14 +52,15 @@ def run_inference(
         click.echo(f"Images: {len(image_paths)}")
         click.echo(f"Confidence threshold: {confidence}")
 
-        click.echo("Loading model...")
-        yolo_model: YOLO = YOLO(model_path)
+        # Load model
+        click.echo("\nLoading model...")
+        yolo_model = YOLO(model_path)
 
-        # show the image result if --show enabled
         if show:
             import matplotlib.pyplot as plt
 
-        click.echo("Running inference...")
+        # Run inference
+        click.echo("Running inference...\n")
 
         for path in tqdm(image_paths, desc="Processing images"):
             result = yolo_model(path, conf=confidence)[0]
@@ -128,9 +70,9 @@ def run_inference(
 
             if len(boxes) > 0:
                 for box in boxes:
-                    cls: int = int(box.cls[0])
-                    conf_score: float = float(box.conf[0])
-                    class_name: str = result.names[cls]
+                    cls = int(box.cls[0])
+                    conf_score = float(box.conf[0])
+                    class_name = result.names[cls]
                     click.echo(f"  • {class_name}: {conf_score:.2f}")
             else:
                 click.echo("  No detections")
@@ -138,9 +80,9 @@ def run_inference(
             # Save or show results
             if save:
                 img = result.plot()
-                output_dir: str = "runs/detect/predict"
+                output_dir = "runs/detect/predict"
                 os.makedirs(output_dir, exist_ok=True)
-                output_path: str = os.path.join(output_dir, os.path.basename(path))
+                output_path = os.path.join(output_dir, os.path.basename(path))
                 cv2.imwrite(output_path, img)
 
             if show:
@@ -153,15 +95,13 @@ def run_inference(
                 plt.show()
 
         if save:
-            click.echo(
-                click.style(f"Results saved to runs/detect/predict/", fg="green")
-            )
+            click.echo(click.style(f"\n✓ Results saved to runs/detect/predict/", fg="green"))
 
-        click.echo(click.style("Inference completed!", fg="green", bold=True))
+        click.echo(click.style("\n✓ Inference completed!", fg="green", bold=True))
 
     except FileNotFoundError as e:
-        click.echo(click.style(f"File not found: {e}", fg="red"))
+        click.echo(click.style(f"✗ File not found: {e}", fg="red"))
         raise click.Abort()
     except Exception as e:
-        click.echo(click.style(f"Inference failed: {str(e)}", fg="red"))
+        click.echo(click.style(f"✗ Inference failed: {str(e)}", fg="red"))
         raise click.Abort()
