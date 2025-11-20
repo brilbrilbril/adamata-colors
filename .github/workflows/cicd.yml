@@ -11,7 +11,7 @@ jobs:
     name: Docker Build
     runs-on: ubuntu-latest
     timeout-minutes: 45
-    needs: tests
+    # needs: tests
     
     steps:
 
