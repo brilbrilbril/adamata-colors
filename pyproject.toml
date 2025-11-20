@@ -48,6 +48,8 @@ exclude = '''
 profile = "black"
 line_length = 100
 skip_gitignore = true
+known_first_party = ["bsort"]
+known_third_party = ["wandb", "click", "ultralytics"]
 
 [tool.pylint.messages_control]
 disable = [
