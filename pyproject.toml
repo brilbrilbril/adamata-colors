@@ -3,7 +3,6 @@ name = "bsort"
 version = "0.1.0"
 description = "CLI tool for Adamata Take Home Test YOLO model"
 authors = ["Brillyando M.A."]
-readme = "README.md"
 packages = [{include = "bsort"}]
 
 [tool.poetry.dependencies]
