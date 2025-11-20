@@ -2,9 +2,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main ]
 
 jobs:
   code-quality:
@@ -82,10 +82,14 @@ jobs:
   docker-build:
     name: Docker Build
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     needs: tests
-    timeout-minutes: 30
     
     steps:
+
+    - name: Free up disk space
+      run: |
+        sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/share/boost /opt/hostedtoolcache
     - name: Checkout code
       uses: actions/checkout@v4
     
@@ -110,6 +114,9 @@ jobs:
           type=semver,pattern={{version}}
           type=semver,pattern={{major}}.{{minor}}
           type=sha
+          
+    - name: Docker system usage
+      run: docker system df
     
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
@@ -121,11 +128,7 @@ jobs:
         cache-from: type=gha
         cache-to: type=gha,mode=max
     
-    - name: Test Docker image (local build)
-      timeout-minutes: 5
+    - name: Test Docker image
       run: |
-        echo "Building test image..."
         docker build -t bsort:test .
-        echo "Testing help command..."
         docker run --rm bsort:test bsort --help
-        echo "Docker test completed successfully!"
