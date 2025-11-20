@@ -41,6 +41,8 @@ By: Brillyando Magathan Achmad
   You can see that the training and validation mAP50 did not differ that much. But the inference time decreased until it reached 10-15ms per image inference. This was the most challenging one because the objective still did not achieve yet even after using GPU Cuda supported.
 
 - Installation:
+
+    **IMPORTANT: MAKE SURE YOUR PYTHON VERSION IS 3.10.x, otherwise it's not working (because I have no time to test using another version)**
     1. Clone this repository
 
     ```
